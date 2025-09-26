@@ -64,21 +64,38 @@
     overflow: hidden;
   }
 
+  /* Base symbol styling */
   .symbol {
     position: absolute;
     font-size: 2.5rem;
     font-weight: bold;
-    text-shadow:
+    text-align: center;
+  }
+
+  /* Hebrew words: red with white glow */
+  .hebrew {
+    color: #f00;
+    text-shadow: 
       0 0 10px #fff,
       0 0 20px #fff,
       0 0 40px #f00,
       0 0 60px #fff;
   }
 
+  /* English phrases: white glow */
+  .english {
+    color: #fff;
+    text-shadow: 
+      0 0 10px #fff,
+      0 0 20px #f00,
+      0 0 30px #fff;
+  }
+
   /* Shake animation when music plays */
   .shake {
     animation: shake 0.25s infinite;
   }
+
   @keyframes shake {
     0%   { transform: translate(0px, 0px) rotate(0deg); }
     25%  { transform: translate(2px, -2px) rotate(-2deg); }
@@ -134,33 +151,34 @@
 const container = document.getElementById('symbols');
 const audio = document.getElementById('player');
 
-// Hebrew (red) and English (white) phrases
 const hebrewWords = ["יהוה", "אלוהים", "אדוני", "ישוע", "משיח", "חיים", "אור", "שלום"];
 const englishWords = [
-  "Jesus is my God",
-  "The Lord God Almighty in Heaven",
-  "Messiah Lives",
-  "God is Light",
-  "Peace Eternal",
+  "Jesus is my God", 
+  "The Lord God Almighty in Heaven", 
+  "Messiah Lives", 
+  "God is Light", 
+  "Peace Eternal", 
   "Glory to the Most High"
 ];
 
-const totalSymbols = 40;
+const totalSymbols = 50;
 
-for (let i = 0; i < totalSymbols; i++) createSymbol();
+// Create floating text
+for (let i = 0; i < totalSymbols; i++) {
+  createSymbol();
+}
 
 function createSymbol() {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
 
-  // Randomly choose Hebrew or English
-  const isHebrew = Math.random() < 0.5;
-  if (isHebrew) {
+  // Randomly choose Hebrew or English and style
+  if (Math.random() < 0.5) {
+    symbol.classList.add('hebrew');
     symbol.innerText = hebrewWords[Math.floor(Math.random() * hebrewWords.length)];
-    symbol.style.color = '#f00'; // red for Hebrew
   } else {
+    symbol.classList.add('english');
     symbol.innerText = englishWords[Math.floor(Math.random() * englishWords.length)];
-    symbol.style.color = '#fff'; // white for English
   }
 
   symbol.style.left = Math.random() * (window.innerWidth - 100) + "px";
@@ -175,28 +193,29 @@ setInterval(() => {
     let currentTop = parseFloat(s.style.top);
     let speed = 1 + Math.random() * 1.2;
     let newTop = currentTop - speed;
-    if (newTop < -50) {
+    if (newTop < -50) { 
       newTop = window.innerHeight + 50;
-      const isHebrew = Math.random() < 0.5;
-      if (isHebrew) {
+
+      if (s.classList.contains('hebrew')) {
         s.innerText = hebrewWords[Math.floor(Math.random() * hebrewWords.length)];
-        s.style.color = '#f00';
       } else {
         s.innerText = englishWords[Math.floor(Math.random() * englishWords.length)];
-        s.style.color = '#fff';
       }
+
       s.style.left = Math.random() * (window.innerWidth - 100) + "px";
     }
     s.style.top = newTop + "px";
   });
 }, 40);
 
-// Shake with music
+// Shake when music plays
 audio.addEventListener('play', () => {
-  document.querySelectorAll('.symbol').forEach(s => s.classList.add('shake'));
+  const symbols = document.querySelectorAll('.symbol');
+  symbols.forEach(s => s.classList.add('shake'));
 });
 audio.addEventListener('pause', () => {
-  document.querySelectorAll('.symbol').forEach(s => s.classList.remove('shake'));
+  const symbols = document.querySelectorAll('.symbol');
+  symbols.forEach(s => s.classList.remove('shake'));
 });
 </script>
 
