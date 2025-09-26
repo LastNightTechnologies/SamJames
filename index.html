@@ -68,9 +68,17 @@
   }
   .symbol {
     position: absolute;
-    font-size: 4rem;
+    font-size: 3rem;
     font-weight: bold;
-    text-shadow: 0 0 20px red, 0 0 40px red, 0 0 60px red;
+  }
+  .hebrew {
+    color: red;
+    text-shadow: none;
+  }
+  .english {
+    color: white;
+    text-shadow: 0 0 10px white, 0 0 20px white;
+    font-size: 2rem;
   }
 
   audio {
@@ -118,20 +126,30 @@
 
 <script>
 const container = document.getElementById('symbols');
-const letters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
-const totalSymbols = 40;
+const hebrewLetters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
+const englishPhrases = [
+  "Jesus Is My God",
+  "The Lord God Almighty in Heaven"
+];
+const totalSymbols = 50;
 
-// Create letters randomly all over the screen
+// Create symbols randomly all over the screen
 for (let i = 0; i < totalSymbols; i++) {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
-  symbol.innerText = letters[Math.floor(Math.random() * letters.length)];
-  symbol.style.left = Math.random() * (window.innerWidth - 50) + "px";
+  if (Math.random() < 0.2) { // 20% chance for English phrase
+    symbol.innerText = englishPhrases[Math.floor(Math.random() * englishPhrases.length)];
+    symbol.classList.add('english');
+  } else {
+    symbol.innerText = hebrewLetters[Math.floor(Math.random() * hebrewLetters.length)];
+    symbol.classList.add('hebrew');
+  }
+  symbol.style.left = Math.random() * (window.innerWidth - 150) + "px";
   symbol.style.top = Math.random() * (window.innerHeight - 50) + "px";
   container.appendChild(symbol);
 }
 
-// Move letters upward continuously
+// Move symbols upward continuously
 setInterval(() => {
   const symbols = document.querySelectorAll('.symbol');
   symbols.forEach(s => {
