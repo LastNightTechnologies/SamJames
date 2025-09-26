@@ -86,7 +86,7 @@
 <body>
 
 <header>
-  <h1>Sam James</h1>
+  <h1>Sam James – Spiritual Flow</h1>
 </header>
 
 <section class="dark">
@@ -120,7 +120,7 @@
 <script>
 const container = document.getElementById('symbols');
 const letters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
-const totalSymbols = 40; // more letters for fuller effect
+const totalSymbols = 40;
 
 // Create letters randomly all over the screen
 for (let i = 0; i < totalSymbols; i++) {
@@ -137,14 +137,13 @@ setInterval(() => {
   const symbols = document.querySelectorAll('.symbol');
   symbols.forEach(s => {
     let currentTop = parseFloat(s.style.top);
-    let speed = 1 + Math.random() * 1.5; // slightly different speeds for natural effect
+    let speed = 1 + Math.random() * 1.5;
     let newTop = currentTop - speed;
-    if (newTop < -50) { newTop = window.innerHeight; } // reset to bottom
+    if (newTop < -50) { newTop = window.innerHeight; }
     s.style.top = newTop + "px";
   });
-}, 30); // speed of animation (smaller = smoother/faster)
+}, 30);
 </script>
 
 </body>
 </html>
-
