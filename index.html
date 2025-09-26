@@ -25,7 +25,7 @@
   header h1 {
     font-size: 2.5rem;
     margin: 0;
-    text-shadow: 0 0 15px #f00, 0 0 30px #fff, 0 0 50px #f00;
+    text-shadow: 0 0 15px #0ff, 0 0 30px #f00, 0 0 50px #fff;
   }
   section {
     height: 100vh;
@@ -37,21 +37,10 @@
     position: relative;
     overflow: hidden;
   }
-  h2 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 10px #fff, 0 0 20px #f00, 0 0 40px #fff;
-    position: relative;
-    z-index: 5;
-  }
-  p {
-    font-size: 1.2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    text-shadow: 0 0 10px #fff, 0 0 20px #f00;
-    position: relative;
-    z-index: 5;
-  }
+  h2, p { z-index: 5; }
+  .dark { background: radial-gradient(circle at center, #000 0%, #111 100%); }
+  .cosmos { background: radial-gradient(circle at center, #001 0%, #002244 100%); }
+  .light { background: radial-gradient(circle at center, #fff 0%, #ccc 100%); color: #000; }
 
   #symbols {
     position: fixed;
@@ -63,47 +52,20 @@
     z-index: 9999;
     overflow: hidden;
   }
-
-  /* Base symbol styling */
   .symbol {
     position: absolute;
     font-size: 2.5rem;
     font-weight: bold;
-    text-align: center;
+    color: red;
+    text-shadow: 0 0 20px #fff, 0 0 40px #fff;
   }
-
-  /* Hebrew words: red with white glow */
-  .hebrew {
-    color: #f00;
-    text-shadow: 
-      0 0 10px #fff,
-      0 0 20px #fff,
-      0 0 40px #f00,
-      0 0 60px #fff;
+  .word {
+    position: absolute;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 20px #fff, 0 0 40px #0ff;
   }
-
-  /* English phrases: white glow */
-  .english {
-    color: #fff;
-    text-shadow: 
-      0 0 10px #fff,
-      0 0 20px #f00,
-      0 0 30px #fff;
-  }
-
-  /* Shake animation when music plays */
-  .shake {
-    animation: shake 0.25s infinite;
-  }
-
-  @keyframes shake {
-    0%   { transform: translate(0px, 0px) rotate(0deg); }
-    25%  { transform: translate(2px, -2px) rotate(-2deg); }
-    50%  { transform: translate(-2px, 2px) rotate(2deg); }
-    75%  { transform: translate(2px, 2px) rotate(-1deg); }
-    100% { transform: translate(0px, 0px) rotate(0deg); }
-  }
-
   audio {
     position: fixed;
     bottom: 20px;
@@ -149,74 +111,66 @@
 
 <script>
 const container = document.getElementById('symbols');
-const audio = document.getElementById('player');
+const hebrewWords = ["יהוה","אלוהים","אדוני","ישוע","משיח","חיים","אור","שלום"];
+const englishWords = ["Jesus Is My God","The Lord God Almighty","Light of the World","Messiah Lives","God Is My Shield"];
+const totalSymbols = 40;
 
-const hebrewWords = ["יהוה", "אלוהים", "אדוני", "ישוע", "משיח", "חיים", "אור", "שלום"];
-const englishWords = [
-  "Jesus is my God", 
-  "The Lord God Almighty in Heaven", 
-  "Messiah Lives", 
-  "God is Light", 
-  "Peace Eternal", 
-  "Glory to the Most High"
-];
-
-const totalSymbols = 50;
-
-// Create floating text
+// Place Hebrew + English words
 for (let i = 0; i < totalSymbols; i++) {
-  createSymbol();
-}
-
-function createSymbol() {
-  const symbol = document.createElement('div');
-  symbol.classList.add('symbol');
-
-  // Randomly choose Hebrew or English and style
-  if (Math.random() < 0.5) {
-    symbol.classList.add('hebrew');
-    symbol.innerText = hebrewWords[Math.floor(Math.random() * hebrewWords.length)];
+  const el = document.createElement('div');
+  if (Math.random() < 0.6) {
+    el.classList.add('symbol');
+    el.innerText = hebrewWords[Math.floor(Math.random() * hebrewWords.length)];
   } else {
-    symbol.classList.add('english');
-    symbol.innerText = englishWords[Math.floor(Math.random() * englishWords.length)];
+    el.classList.add('word');
+    el.innerText = englishWords[Math.floor(Math.random() * englishWords.length)];
   }
-
-  symbol.style.left = Math.random() * (window.innerWidth - 100) + "px";
-  symbol.style.top = Math.random() * (window.innerHeight - 50) + "px";
-  container.appendChild(symbol);
+  el.style.left = Math.random() * (window.innerWidth - 100) + "px";
+  el.style.top = Math.random() * (window.innerHeight - 50) + "px";
+  container.appendChild(el);
 }
 
-// Move letters upward continuously
+// Floating upward
 setInterval(() => {
-  const symbols = document.querySelectorAll('.symbol');
-  symbols.forEach(s => {
-    let currentTop = parseFloat(s.style.top);
-    let speed = 1 + Math.random() * 1.2;
-    let newTop = currentTop - speed;
-    if (newTop < -50) { 
-      newTop = window.innerHeight + 50;
-
-      if (s.classList.contains('hebrew')) {
-        s.innerText = hebrewWords[Math.floor(Math.random() * hebrewWords.length)];
-      } else {
-        s.innerText = englishWords[Math.floor(Math.random() * englishWords.length)];
-      }
-
-      s.style.left = Math.random() * (window.innerWidth - 100) + "px";
-    }
-    s.style.top = newTop + "px";
+  document.querySelectorAll('.symbol,.word').forEach(el => {
+    let currentTop = parseFloat(el.style.top);
+    let newTop = currentTop - 1.5;
+    if (newTop < -50) newTop = window.innerHeight;
+    el.style.top = newTop + "px";
   });
-}, 40);
+}, 30);
 
-// Shake when music plays
-audio.addEventListener('play', () => {
-  const symbols = document.querySelectorAll('.symbol');
-  symbols.forEach(s => s.classList.add('shake'));
-});
-audio.addEventListener('pause', () => {
-  const symbols = document.querySelectorAll('.symbol');
-  symbols.forEach(s => s.classList.remove('shake'));
-});
+// Music beat reaction
+const audio = document.getElementById('player');
+let audioCtx, analyser, source, dataArray;
+
+audio.onplay = () => {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+    source = audioCtx.createMediaElementSource(audio);
+    analyser = audioCtx.createAnalyser();
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+  }
+  animate();
+};
+
+function animate() {
+  if (!analyser) return;
+  analyser.getByteFrequencyData(dataArray);
+  let volume = dataArray.reduce((a,b)=>a+b) / dataArray.length;
+
+  document.querySelectorAll('.symbol,.word').forEach(el => {
+    let intensity = volume / 300; // shake stronger on beat
+    let x = (Math.random() - 0.5) * intensity * 20;
+    let y = (Math.random() - 0.5) * intensity * 20;
+    el.style.transform = `translate(${x}px, ${y}px)`;
+  });
+
+  requestAnimationFrame(animate);
+}
 </script>
 
 </body>
