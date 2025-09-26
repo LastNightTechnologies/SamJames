@@ -72,8 +72,19 @@
       font-weight: bold;
       color: #fff;
       text-shadow: 0 0 20px #0ff, 0 0 40px #f00, 0 0 60px #fff;
-      transition: transform 0.2s linear; /* smooth movement */
+      transition: transform 0.2s linear;
     }
+
+    /* Wave bounce animation */
+    @keyframes waveMotion {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-30px); }
+      100% { transform: translateY(0px); }
+    }
+    .wave {
+      animation: waveMotion 0.5s ease-in-out infinite alternate;
+    }
+
     audio {
       position: fixed;
       bottom: 20px;
@@ -121,9 +132,8 @@
 const container = document.getElementById('symbols');
 const letters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
 const audio = document.getElementById('player');
-let bounceInterval = null;
 
-// Create initial letters randomly all over the screen
+// Create letters randomly all over the screen
 for (let i = 0; i < 30; i++) {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
@@ -133,24 +143,16 @@ for (let i = 0; i < 30; i++) {
   container.appendChild(symbol);
 }
 
-// When music plays, make letters bounce randomly
+// Add wave animation when music plays
 audio.addEventListener('play', () => {
-  if (bounceInterval) return; // avoid duplicates
-  bounceInterval = setInterval(() => {
-    const symbols = document.querySelectorAll('.symbol');
-    symbols.forEach(s => {
-      const randomX = Math.random() * (window.innerWidth - 50);
-      const randomY = Math.random() * (window.innerHeight - 50);
-      const randomRotate = Math.random() * 360;
-      s.style.transform = `translate(${randomX}px, ${randomY}px) rotate(${randomRotate}deg)`;
-    });
-  }, 200); // adjust speed of bouncing
+  const symbols = document.querySelectorAll('.symbol');
+  symbols.forEach(s => s.classList.add('wave'));
 });
 
-// Stop bouncing when paused
+// Remove wave animation when paused
 audio.addEventListener('pause', () => {
-  clearInterval(bounceInterval);
-  bounceInterval = null;
+  const symbols = document.querySelectorAll('.symbol');
+  symbols.forEach(s => s.classList.remove('wave'));
 });
 </script>
 
