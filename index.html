@@ -170,10 +170,9 @@ function animate() {
 
   document.querySelectorAll('.symbol,.word').forEach(el => {
     let intensity = volume / 300;
-    let x = (Math.random() - 0.5) * intensity * 20;
-    let y = (Math.random() - 0.5) * intensity * 20;
-    let scale = 1 + intensity * 0.5; // pulse with beat
-    el.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    let yBounce = Math.sin(Date.now() / 100) * intensity * 15; // up-down bounce
+    let scale = 1 + intensity * 0.5; // pulse size with beat
+    el.style.transform = `translateY(${yBounce}px) scale(${scale})`;
   });
 
   requestAnimationFrame(animate);
