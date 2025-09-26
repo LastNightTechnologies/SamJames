@@ -25,8 +25,34 @@
   header h1 {
     font-size: 2.5rem;
     margin: 0;
-    text-shadow: 0 0 15px #0ff, 0 0 30px #f00, 0 0 50px #fff;
+    text-shadow: 0 0 15px #f00, 0 0 30px #fff, 0 0 50px #f00;
   }
+  section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px #fff, 0 0 20px #f00, 0 0 40px #fff;
+    position: relative;
+    z-index: 5;
+  }
+  p {
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-shadow: 0 0 10px #fff, 0 0 20px #f00;
+    position: relative;
+    z-index: 5;
+  }
+
   #symbols {
     position: fixed;
     top: 0;
@@ -37,19 +63,32 @@
     z-index: 9999;
     overflow: hidden;
   }
+
   .symbol {
     position: absolute;
+    font-size: 2.5rem;
     font-weight: bold;
+    color: #f00; /* red */
+    text-shadow: 
+      0 0 10px #fff,
+      0 0 20px #fff,
+      0 0 40px #f00,
+      0 0 60px #fff;
   }
-  .hebrew {
-    color: red;
-    font-size: 3rem;
+
+  /* Shake animation when music plays */
+  .shake {
+    animation: shake 0.25s infinite;
   }
-  .english {
-    color: white;
-    text-shadow: 0 0 10px white, 0 0 20px white;
-    font-size: 2rem;
+
+  @keyframes shake {
+    0%   { transform: translate(0px, 0px) rotate(0deg); }
+    25%  { transform: translate(2px, -2px) rotate(-2deg); }
+    50%  { transform: translate(-2px, 2px) rotate(2deg); }
+    75%  { transform: translate(2px, 2px) rotate(-1deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
   }
+
   audio {
     position: fixed;
     bottom: 20px;
@@ -65,6 +104,27 @@
   <h1>Sam James</h1>
 </header>
 
+<section class="dark">
+  <div>
+    <h2>A Revelation Is Coming!</h2>
+    <p>Get Ready.</p>
+  </div>
+</section>
+
+<section class="cosmos">
+  <div>
+    <h2>Soul Search</h2>
+    <p>Among constellations and pyramids, the spirit drifts through cosmic truth.</p>
+  </div>
+</section>
+
+<section class="light">
+  <div>
+    <h2>Spiritual Victory</h2>
+    <p>Light consumes the darkness — the vessel of God rises, untouchable.</p>
+  </div>
+</section>
+
 <audio id="player" controls>
   <source src="MyShieldAndBuckler.mp4" type="audio/mp4">
   Your browser does not support the audio element.
@@ -74,80 +134,62 @@
 
 <script>
 const container = document.getElementById('symbols');
-const hebrewLetters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
-const englishPhrases = [
-  "Jesus Is My God",
-  "The Lord God Almighty in Heaven",
-  "Faith Over Fear",
-  "Pray Without Ceasing",
-  "God Is Love",
-  "Blessed and Highly Favored",
-  "Spirit Leads Me",
-  "Holy Spirit Guide Me",
-  "Victory in Jesus",
-  "Praise His Name"
-];
-const totalSymbols = 50;
-const symbols = [];
+const audio = document.getElementById('player');
 
-// Create letters
+const phrases = [
+  // Hebrew holy words
+  "יהוה", "אלוהים", "אדוני", "ישוע", "משיח", "חיים", "אור", "שלום",
+  // English holy words
+  "Jesus is my God", 
+  "The Lord God Almighty in Heaven", 
+  "Messiah Lives", 
+  "God is Light", 
+  "Peace Eternal", 
+  "Glory to the Most High"
+];
+
+const totalSymbols = 40;
+
+// Create floating text
 for (let i = 0; i < totalSymbols; i++) {
+  createSymbol();
+}
+
+function createSymbol() {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
-  if (Math.random() < 0.3) {
-    symbol.innerText = englishPhrases[Math.floor(Math.random() * englishPhrases.length)];
-    symbol.classList.add('english');
-  } else {
-    symbol.innerText = hebrewLetters[Math.floor(Math.random() * hebrewLetters.length)];
-    symbol.classList.add('hebrew');
-  }
-  symbol.style.left = Math.random() * (window.innerWidth - 150) + "px";
+  symbol.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+  symbol.style.left = Math.random() * (window.innerWidth - 100) + "px";
   symbol.style.top = Math.random() * (window.innerHeight - 50) + "px";
   container.appendChild(symbol);
-  symbols.push({el: symbol, baseTop: parseFloat(symbol.style.top)});
 }
 
-// Animate upward movement + bounce
-function animateSymbols(bounce = 0) {
+// Move letters upward continuously
+setInterval(() => {
+  const symbols = document.querySelectorAll('.symbol');
   symbols.forEach(s => {
-    let newTop = s.baseTop - 0.5;  // slow upward movement
-    if (newTop < -50) newTop = window.innerHeight;
-    s.baseTop = newTop;
-    s.el.style.top = (newTop + bounce) + "px";
+    let currentTop = parseFloat(s.style.top);
+    let speed = 1 + Math.random() * 1.2;
+    let newTop = currentTop - speed;
+    if (newTop < -50) { 
+      newTop = window.innerHeight + 50;
+      s.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+      s.style.left = Math.random() * (window.innerWidth - 100) + "px";
+    }
+    s.style.top = newTop + "px";
   });
-  requestAnimationFrame(() => animateSymbols(currentBounce));
-}
+}, 40);
 
-let currentBounce = 0;
-
-// Audio Analysis for beat
-const audio = document.getElementById('player');
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const analyser = audioCtx.createAnalyser();
-const source = audioCtx.createMediaElementSource(audio);
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
-analyser.fftSize = 256;
-const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-function updateBounce() {
-  analyser.getByteFrequencyData(dataArray);
-  // Average the frequency data for a simple "volume" measure
-  let sum = 0;
-  for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-  const avg = sum / dataArray.length;
-  // Map average to bounce range
-  currentBounce = avg / 5; // adjust sensitivity
-  requestAnimationFrame(updateBounce);
-}
-
+// Shake when music plays
 audio.addEventListener('play', () => {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  updateBounce();
+  const symbols = document.querySelectorAll('.symbol');
+  symbols.forEach(s => s.classList.add('shake'));
 });
-
-animateSymbols();
-
+audio.addEventListener('pause', () => {
+  const symbols = document.querySelectorAll('.symbol');
+  symbols.forEach(s => s.classList.remove('shake'));
+});
 </script>
+
 </body>
 </html>
