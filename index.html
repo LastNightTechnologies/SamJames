@@ -72,17 +72,7 @@
       font-weight: bold;
       color: #fff;
       text-shadow: 0 0 20px #0ff, 0 0 40px #f00, 0 0 60px #fff;
-      transition: transform 0.2s linear;
-    }
-
-    /* Wave bounce animation */
-    @keyframes waveMotion {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-30px); }
-      100% { transform: translateY(0px); }
-    }
-    .wave {
-      animation: waveMotion 0.5s ease-in-out infinite alternate;
+      transition: transform 0.1s linear;
     }
 
     audio {
@@ -132,8 +122,9 @@
 const container = document.getElementById('symbols');
 const letters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
 const audio = document.getElementById('player');
+let riseInterval = null;
 
-// Create letters randomly all over the screen
+// Create letters randomly all over the screen on load
 for (let i = 0; i < 30; i++) {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
@@ -143,16 +134,24 @@ for (let i = 0; i < 30; i++) {
   container.appendChild(symbol);
 }
 
-// Add wave animation when music plays
+// When music plays, make letters rise continuously
 audio.addEventListener('play', () => {
-  const symbols = document.querySelectorAll('.symbol');
-  symbols.forEach(s => s.classList.add('wave'));
+  if (riseInterval) return; // prevent multiple intervals
+  riseInterval = setInterval(() => {
+    const symbols = document.querySelectorAll('.symbol');
+    symbols.forEach(s => {
+      const currentTop = parseFloat(s.style.top);
+      let newTop = currentTop - 2; // move up 2px per tick
+      if (newTop < -50) { newTop = window.innerHeight; } // reset at top
+      s.style.top = newTop + "px";
+    });
+  }, 50); // speed of rising
 });
 
-// Remove wave animation when paused
+// Stop rising when paused
 audio.addEventListener('pause', () => {
-  const symbols = document.querySelectorAll('.symbol');
-  symbols.forEach(s => s.classList.remove('wave'));
+  clearInterval(riseInterval);
+  riseInterval = null;
 });
 </script>
 
