@@ -56,16 +56,18 @@
   .cosmos { background: radial-gradient(circle at center, #001 0%, #002244 100%); }
   .light { background: radial-gradient(circle at center, #fff 0%, #ccc 100%); color: #000; }
 
-  #symbols {
+  #symbols, #chribum {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 9999;
     overflow: hidden;
   }
+  #symbols { z-index: 9999; }
+  #chribum { z-index: 4000; }
+
   .symbol {
     position: absolute;
     font-weight: bold;
@@ -78,6 +80,16 @@
     color: white;
     text-shadow: 0 0 10px white, 0 0 20px white;
     font-size: 2rem;
+  }
+
+  .chribum {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 15px white);
+    opacity: 0.9;
   }
 
   audio {
@@ -122,9 +134,12 @@
 </audio>
 
 <div id="symbols"></div>
+<div id="chribum"></div>
 
 <script>
 const container = document.getElementById('symbols');
+const chribumContainer = document.getElementById('chribum');
+
 const hebrewLetters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
 const englishPhrases = [
   "Jesus Is My God",
@@ -139,12 +154,13 @@ const englishPhrases = [
   "Praise His Name"
 ];
 const totalSymbols = 50;
+const totalChribum = 100;
 
-// Create symbols randomly all over the screen
+// Create Hebrew/English symbols randomly
 for (let i = 0; i < totalSymbols; i++) {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
-  if (Math.random() < 0.3) { // 30% chance for English phrase
+  if (Math.random() < 0.3) {
     symbol.innerText = englishPhrases[Math.floor(Math.random() * englishPhrases.length)];
     symbol.classList.add('english');
   } else {
@@ -156,7 +172,17 @@ for (let i = 0; i < totalSymbols; i++) {
   container.appendChild(symbol);
 }
 
-// Move all symbols upward continuously
+// Create chribum particles
+for (let i = 0; i < totalChribum; i++) {
+  const dot = document.createElement('div');
+  dot.classList.add('chribum');
+  dot.style.left = Math.random() * window.innerWidth + "px";
+  dot.style.top = Math.random() * window.innerHeight + "px";
+  dot.speed = 0.5 + Math.random(); // store speed
+  chribumContainer.appendChild(dot);
+}
+
+// Move symbols upward
 function moveSymbols() {
   const symbols = document.querySelectorAll('.symbol');
   symbols.forEach(s => {
@@ -170,17 +196,29 @@ function moveSymbols() {
 }
 moveSymbols();
 
-// Shake English phrases with stronger beat effect
+// Move chribum upward
+function moveChribum() {
+  const dots = document.querySelectorAll('.chribum');
+  dots.forEach(d => {
+    let currentTop = parseFloat(d.style.top);
+    let newTop = currentTop - d.speed;
+    if (newTop < -10) newTop = window.innerHeight;
+    d.style.top = newTop + "px";
+  });
+  requestAnimationFrame(moveChribum);
+}
+moveChribum();
+
+// Shake English phrases on music play
 const audio = document.getElementById('player');
 let shakePhase = 0;
-
 function shakeEnglish() {
   if (!audio.paused) {
     const englishSymbols = document.querySelectorAll('.english');
-    shakePhase += 0.3; // stronger/faster shake
+    shakePhase += 0.3;
     englishSymbols.forEach(s => {
-      const xOffset = Math.sin(shakePhase + Math.random()) * 8;
-      const yOffset = Math.cos(shakePhase + Math.random()) * 8;
+      const xOffset = Math.sin(shakePhase + Math.random()) * 10;
+      const yOffset = Math.cos(shakePhase + Math.random()) * 10;
       s.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
     });
     requestAnimationFrame(shakeEnglish);
@@ -189,10 +227,7 @@ function shakeEnglish() {
     englishSymbols.forEach(s => s.style.transform = 'translate(0,0)');
   }
 }
-
-audio.addEventListener('play', () => {
-  shakeEnglish();
-});
+audio.addEventListener('play', () => { shakeEnglish(); });
 </script>
 
 </body>
