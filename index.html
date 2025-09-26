@@ -78,7 +78,6 @@
     color: white;
     text-shadow: 0 0 10px white, 0 0 20px white;
     font-size: 2rem;
-    transition: transform 0.05s ease;
   }
 
   audio {
@@ -149,37 +148,42 @@ for (let i = 0; i < totalSymbols; i++) {
   container.appendChild(symbol);
 }
 
-// Move symbols upward continuously
-setInterval(() => {
+// Move all symbols upward continuously
+function moveSymbols() {
   const symbols = document.querySelectorAll('.symbol');
   symbols.forEach(s => {
     let currentTop = parseFloat(s.style.top);
     let speed = 1 + Math.random() * 1.5;
     let newTop = currentTop - speed;
-    if (newTop < -50) { newTop = window.innerHeight; }
+    if (newTop < -50) newTop = window.innerHeight;
     s.style.top = newTop + "px";
   });
-}, 30);
+  requestAnimationFrame(moveSymbols);
+}
+moveSymbols();
 
-// Shake English phrases when music plays
+// Shake English phrases with the beat
 const audio = document.getElementById('player');
-audio.addEventListener('play', () => {
-  const shakeInterval = setInterval(() => {
+let shakePhase = 0;
+
+function shakeEnglish() {
+  if (!audio.paused) {
     const englishSymbols = document.querySelectorAll('.english');
+    shakePhase += 0.2;
     englishSymbols.forEach(s => {
-      const xOffset = (Math.random() - 0.5) * 4; // shake left/right
-      const yOffset = (Math.random() - 0.5) * 4; // shake up/down
+      const xOffset = Math.sin(shakePhase + Math.random()) * 5; // stronger shake
+      const yOffset = Math.cos(shakePhase + Math.random()) * 5;
       s.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
     });
-  }, 50);
-  
-  audio.addEventListener('pause', () => {
-    clearInterval(shakeInterval);
+    requestAnimationFrame(shakeEnglish);
+  } else {
     const englishSymbols = document.querySelectorAll('.english');
-    englishSymbols.forEach(s => {
-      s.style.transform = 'translate(0,0)';
-    });
-  }, { once: true });
+    englishSymbols.forEach(s => s.style.transform = 'translate(0,0)');
+  }
+}
+
+audio.addEventListener('play', () => {
+  shakeEnglish();
 });
 </script>
 
