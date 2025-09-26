@@ -128,7 +128,15 @@ const container = document.getElementById('symbols');
 const hebrewLetters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
 const englishPhrases = [
   "Jesus Is My God",
-  "The Lord God Almighty in Heaven"
+  "The Lord God Almighty in Heaven",
+  "Faith Over Fear",
+  "Pray Without Ceasing",
+  "God Is Love",
+  "Blessed and Highly Favored",
+  "Spirit Leads Me",
+  "Holy Spirit Guide Me",
+  "Victory in Jesus",
+  "Praise His Name"
 ];
 const totalSymbols = 50;
 
@@ -136,7 +144,7 @@ const totalSymbols = 50;
 for (let i = 0; i < totalSymbols; i++) {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
-  if (Math.random() < 0.2) { // 20% chance for English phrase
+  if (Math.random() < 0.3) { // 30% chance for English phrase
     symbol.innerText = englishPhrases[Math.floor(Math.random() * englishPhrases.length)];
     symbol.classList.add('english');
   } else {
@@ -162,17 +170,17 @@ function moveSymbols() {
 }
 moveSymbols();
 
-// Shake English phrases with the beat
+// Shake English phrases with stronger beat effect
 const audio = document.getElementById('player');
 let shakePhase = 0;
 
 function shakeEnglish() {
   if (!audio.paused) {
     const englishSymbols = document.querySelectorAll('.english');
-    shakePhase += 0.2;
+    shakePhase += 0.3; // stronger/faster shake
     englishSymbols.forEach(s => {
-      const xOffset = Math.sin(shakePhase + Math.random()) * 5; // stronger shake
-      const yOffset = Math.cos(shakePhase + Math.random()) * 5;
+      const xOffset = Math.sin(shakePhase + Math.random()) * 8;
+      const yOffset = Math.cos(shakePhase + Math.random()) * 8;
       s.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
     });
     requestAnimationFrame(shakeEnglish);
