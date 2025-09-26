@@ -1,88 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sam James – Spiritual Flow</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Montserrat', sans-serif;
-      background: #000;
-      color: #fff;
-      overflow-x: hidden;
-    }
-    header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      text-align: center;
-      padding: 1.5rem;
-      background: rgba(0,0,0,0.6);
-      z-index: 10000;
-    }
-    header h1 {
-      font-size: 2.5rem;
-      margin: 0;
-      text-shadow: 0 0 15px #0ff, 0 0 30px #f00, 0 0 50px #fff;
-    }
-    section {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-    h2 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 10px #fff, 0 0 20px #0ff, 0 0 40px #f00;
-      position: relative;
-      z-index: 5;
-    }
-    p {
-      font-size: 1.2rem;
-      max-width: 800px;
-      margin: 0 auto;
-      text-shadow: 0 0 10px #0ff, 0 0 20px #fff;
-      position: relative;
-      z-index: 5;
-    }
-    .dark { background: radial-gradient(circle at center, #000 0%, #111 100%); }
-    .cosmos { background: radial-gradient(circle at center, #001 0%, #002244 100%); }
-    .light { background: radial-gradient(circle at center, #fff 0%, #ccc 100%); color: #000; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sam James – Spiritual Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
+  }
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+  }
+  header h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 0 0 15px #0ff, 0 0 30px #f00, 0 0 50px #fff;
+  }
+  section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px #fff, 0 0 20px #0ff, 0 0 40px #f00;
+    position: relative;
+    z-index: 5;
+  }
+  p {
+    font-size: 1.2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #fff;
+    position: relative;
+    z-index: 5;
+  }
+  .dark { background: radial-gradient(circle at center, #000 0%, #111 100%); }
+  .cosmos { background: radial-gradient(circle at center, #001 0%, #002244 100%); }
+  .light { background: radial-gradient(circle at center, #fff 0%, #ccc 100%); color: #000; }
 
-    #symbols {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-      overflow: hidden;
-    }
-    .symbol {
-      position: absolute;
-      font-size: 4rem;
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 0 0 20px #0ff, 0 0 40px #f00, 0 0 60px #fff;
-      transition: transform 0.1s linear;
-    }
+  #symbols {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+  .symbol {
+    position: absolute;
+    font-size: 4rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 20px #0ff, 0 0 40px #f00, 0 0 60px #fff;
+  }
 
-    audio {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10000;
-    }
-  </style>
+  audio {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+  }
+</style>
 </head>
 <body>
 
@@ -121,11 +120,10 @@
 <script>
 const container = document.getElementById('symbols');
 const letters = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י"];
-const audio = document.getElementById('player');
-let riseInterval = null;
+const totalSymbols = 40; // more letters for fuller effect
 
-// Create letters randomly all over the screen on load
-for (let i = 0; i < 30; i++) {
+// Create letters randomly all over the screen
+for (let i = 0; i < totalSymbols; i++) {
   const symbol = document.createElement('div');
   symbol.classList.add('symbol');
   symbol.innerText = letters[Math.floor(Math.random() * letters.length)];
@@ -134,25 +132,17 @@ for (let i = 0; i < 30; i++) {
   container.appendChild(symbol);
 }
 
-// When music plays, make letters rise continuously
-audio.addEventListener('play', () => {
-  if (riseInterval) return; // prevent multiple intervals
-  riseInterval = setInterval(() => {
-    const symbols = document.querySelectorAll('.symbol');
-    symbols.forEach(s => {
-      const currentTop = parseFloat(s.style.top);
-      let newTop = currentTop - 2; // move up 2px per tick
-      if (newTop < -50) { newTop = window.innerHeight; } // reset at top
-      s.style.top = newTop + "px";
-    });
-  }, 50); // speed of rising
-});
-
-// Stop rising when paused
-audio.addEventListener('pause', () => {
-  clearInterval(riseInterval);
-  riseInterval = null;
-});
+// Move letters upward continuously
+setInterval(() => {
+  const symbols = document.querySelectorAll('.symbol');
+  symbols.forEach(s => {
+    let currentTop = parseFloat(s.style.top);
+    let speed = 1 + Math.random() * 1.5; // slightly different speeds for natural effect
+    let newTop = currentTop - speed;
+    if (newTop < -50) { newTop = window.innerHeight; } // reset to bottom
+    s.style.top = newTop + "px";
+  });
+}, 30); // speed of animation (smaller = smoother/faster)
 </script>
 
 </body>
