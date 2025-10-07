@@ -1,3 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sam James</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
+  }
+  header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+  }
+  header h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 0 0 15px #0ff, 0 0 30px #f00, 0 0 50px #fff;
+  }
+  section {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  h2, p { z-index: 5; }
+  .dark { background: radial-gradient(circle at center, #000 0%, #111 100%); }
+  .cosmos { background: radial-gradient(circle at center, #001 0%, #002244 100%); }
+  .light { background: radial-gradient(circle at center, #fff 0%, #ccc 100%); color: #000; }
+
+  #symbols, #meteors {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .symbol, .word {
+    position: absolute;
+    font-weight: bold;
+  }
+  .symbol { color: red; text-shadow: 0 0 20px #fff, 0 0 40px #fff; }
+  .word { color: white; text-shadow: 0 0 20px #fff, 0 0 40px #0ff; }
+
+  .meteor {
+    position: absolute;
+    width: 6px;
+    height: 3px;
+    border-radius: 50%;
+    background: gold;
+    opacity: 1;
+    pointer-events: none;
+    filter: blur(2px);
+    box-shadow: 0 0 12px gold, 0 0 20px gold, 0 0 28px #ffd700;
+    transform: rotate(45deg);
+  }
+
+  audio {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+  }
+  @media (max-width: 600px) {
+    audio { bottom: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Sam James</h1>
+</header>
+
+<section class="dark">
+  <div>
+    <h2>A Revelation Is Coming!</h2>
+    <p>Get Ready.</p>
+  </div>
+</section>
+
+<section class="cosmos">
+  <div>
+    <h2>Soul Search</h2>
+    <p>Among constellations and pyramids, the spirit drifts through cosmic truth.</p>
+  </div>
+</section>
+
+<section class="light">
+  <div>
+    <h2>Spiritual Victory</h2>
+    <p>Light consumes the darkness — the vessel of God rises, untouchable.</p>
+  </div>
+</section>
+
+<audio id="player" controls>
+  <source src="MyShieldAndBuckler.mp4" type="audio/mp4">
+  Your browser does not support the audio element.
+</audio>
+
+<div id="symbols"></div>
+<div id="meteors"></div>
+
+<script>
+const container = document.getElementById('symbols');
+const meteorContainer = document.getElementById('meteors');
+
+const hebrewWords = ["יהוה","אלוהים","אדוני","ישוע","משיח","חיים","אור","שלום"];
+const englishWords = [
+  "Jesus Is My God",
+  "The Lord God Almighty",
+  "Light of the World",
+  "Messiah Lives",
+  "God Is My Shield"
+];
+
+const symbols = [];
+const totalSymbols = 35;
+const minDistance = Math.max(50, window.innerWidth / 20);
+
+function isFarEnough(x, y) {
+  for (let s of symbols) {
+    const sx = parseFloat(s.style.left);
+    const sy = parseFloat(s.style.top);
+    const dx = x - sx;
+    const dy = y - sy;
+    if (Math.sqrt(dx*dx + dy*dy) < minDistance) return false;
+  }
+  return true;
+}
+
+// Create symbols
 for (let i = 0; i < totalSymbols; i++) {
   const el = document.createElement('div');
   const isEnglish = Math.random() < 0.5;
@@ -15,9 +166,8 @@ for (let i = 0; i < totalSymbols; i++) {
 
   let x, y, attempts = 0;
   do {
-    // Force English words to appear more left/center
     if (isEnglish) {
-      x = Math.random() * (window.innerWidth * 0.6); // 0% to 60% of width
+      x = Math.random() * (window.innerWidth * 0.6); // English mostly left/center
     } else {
       x = Math.random() * (window.innerWidth - 50);
     }
@@ -31,3 +181,92 @@ for (let i = 0; i < totalSymbols; i++) {
   container.appendChild(el);
   symbols.push(el);
 }
+
+// Floating upward
+setInterval(() => {
+  symbols.forEach(el => {
+    let currentTop = parseFloat(el.style.top);
+    let newTop = currentTop - 1.5;
+    if (newTop < -50) newTop = window.innerHeight;
+    el.style.top = newTop + "px";
+  });
+}, 30);
+
+// Music pulse
+const audio = document.getElementById('player');
+let audioCtx, analyser, source, dataArray;
+
+audio.onplay = () => {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    source = audioCtx.createMediaElementSource(audio);
+    analyser = audioCtx.createAnalyser();
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    analyser.fftSize = 256;
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+  }
+  animate();
+};
+
+function animate() {
+  if (!analyser) return;
+  analyser.getByteFrequencyData(dataArray);
+  let volume = dataArray.reduce((a,b)=>a+b) / dataArray.length;
+
+  symbols.forEach(el => {
+    let intensity = volume / 300;
+    let yBounce = Math.sin(Date.now() / 100 + Math.random()) * intensity * 15;
+    let scale = 1 + intensity * 0.4;
+
+    el.style.textShadow = `
+      0 0 ${10 + intensity*15}px #fff,
+      0 0 ${20 + intensity*30}px #0ff,
+      0 0 ${30 + intensity*45}px #f0f
+    `;
+
+    el.style.transform = `translateY(${yBounce}px) scale(${scale})`;
+  });
+
+  requestAnimationFrame(animate);
+}
+
+// Gold neon meteor
+function spawnMeteor() {
+  const word = symbols[Math.floor(Math.random() * symbols.length)];
+  const rect = word.getBoundingClientRect();
+
+  const meteor = document.createElement('div');
+  meteor.classList.add('meteor');
+  meteor.style.left = rect.left + rect.width/2 + 'px';
+  meteor.style.top = rect.top + rect.height/2 + 'px';
+  meteorContainer.appendChild(meteor);
+
+  const angle = Math.random() * 0.5 + 0.25; 
+  const speed = 6 + Math.random() * 3;
+  let opacity = 1;
+
+  function move() {
+    const x = parseFloat(meteor.style.left);
+    const y = parseFloat(meteor.style.top);
+
+    meteor.style.left = x + speed * Math.cos(angle) + 'px';
+    meteor.style.top = y + speed * Math.sin(angle) + 'px';
+    opacity -= 0.012;
+    meteor.style.opacity = opacity;
+
+    if (opacity > 0 && x < window.innerWidth && y < window.innerHeight) {
+      requestAnimationFrame(move);
+    } else {
+      meteorContainer.removeChild(meteor);
+    }
+  }
+
+  move();
+}
+
+setInterval(spawnMeteor, 30000);
+</script>
+
+</body>
+</html>
