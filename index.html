@@ -56,9 +56,10 @@
   .symbol, .word {
     position: absolute;
     font-weight: bold;
+    will-change: transform;
   }
-  .symbol { color: red; text-shadow: 0 0 20px #fff, 0 0 40px #fff; }
-  .word { color: white; text-shadow: 0 0 20px #fff, 0 0 40px #0ff; }
+  .symbol { color: red; text-shadow: 0 0 10px #fff; }
+  .word { color: white; text-shadow: 0 0 10px #0ff; }
 
   .meteor {
     position: absolute;
@@ -133,8 +134,10 @@ const englishWords = [
   "God Is My Shield"
 ];
 
+const isSmallDevice = window.innerWidth < 600;
+
 const symbols = [];
-const totalSymbols = 35;
+let totalSymbols = isSmallDevice ? 15 : 35;
 const minDistance = Math.max(50, window.innerWidth / 20);
 
 function isFarEnough(x, y) {
@@ -161,13 +164,13 @@ for (let i = 0; i < totalSymbols; i++) {
     el.innerText = hebrewWords[Math.floor(Math.random() * hebrewWords.length)];
   }
 
-  const fontSize = Math.max(12, (window.innerWidth / 32) * 0.7);
+  const fontSize = Math.max(10, (window.innerWidth / 32) * 0.7);
   el.style.fontSize = fontSize + "px";
 
   let x, y, attempts = 0;
   do {
     if (isEnglish) {
-      x = Math.random() * (window.innerWidth * 0.6); // English mostly left/center
+      x = Math.random() * (window.innerWidth * 0.6);
     } else {
       x = Math.random() * (window.innerWidth - 50);
     }
@@ -182,21 +185,22 @@ for (let i = 0; i < totalSymbols; i++) {
   symbols.push(el);
 }
 
-// Floating upward
+// Floating upward (slower)
 setInterval(() => {
   symbols.forEach(el => {
     let currentTop = parseFloat(el.style.top);
-    let newTop = currentTop - 1.5;
+    let newTop = currentTop - (isSmallDevice ? 0.5 : 1.5);
     if (newTop < -50) newTop = window.innerHeight;
     el.style.top = newTop + "px";
   });
 }, 30);
 
-// Music pulse
+// Music pulse (disable on small devices)
 const audio = document.getElementById('player');
 let audioCtx, analyser, source, dataArray;
 
 audio.onplay = () => {
+  if (isSmallDevice) return; // skip pulse on small devices
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     source = audioCtx.createMediaElementSource(audio);
@@ -216,56 +220,53 @@ function animate() {
 
   symbols.forEach(el => {
     let intensity = volume / 300;
-    let yBounce = Math.sin(Date.now() / 100 + Math.random()) * intensity * 15;
-    let scale = 1 + intensity * 0.4;
-
-    el.style.textShadow = `
-      0 0 ${10 + intensity*15}px #fff,
-      0 0 ${20 + intensity*30}px #0ff,
-      0 0 ${30 + intensity*45}px #f0f
-    `;
+    let yBounce = Math.sin(Date.now() / 150) * intensity * 10;
+    let scale = 1 + intensity * 0.2;
 
     el.style.transform = `translateY(${yBounce}px) scale(${scale})`;
+    el.style.textShadow = `0 0 ${5 + intensity*5}px #fff`;
   });
 
   requestAnimationFrame(animate);
 }
 
-// Gold neon meteor
-function spawnMeteor() {
-  const word = symbols[Math.floor(Math.random() * symbols.length)];
-  const rect = word.getBoundingClientRect();
+// Gold neon meteor (only on larger devices)
+if (!isSmallDevice) {
+  function spawnMeteor() {
+    const word = symbols[Math.floor(Math.random() * symbols.length)];
+    const rect = word.getBoundingClientRect();
 
-  const meteor = document.createElement('div');
-  meteor.classList.add('meteor');
-  meteor.style.left = rect.left + rect.width/2 + 'px';
-  meteor.style.top = rect.top + rect.height/2 + 'px';
-  meteorContainer.appendChild(meteor);
+    const meteor = document.createElement('div');
+    meteor.classList.add('meteor');
+    meteor.style.left = rect.left + rect.width/2 + 'px';
+    meteor.style.top = rect.top + rect.height/2 + 'px';
+    meteorContainer.appendChild(meteor);
 
-  const angle = Math.random() * 0.5 + 0.25; 
-  const speed = 6 + Math.random() * 3;
-  let opacity = 1;
+    const angle = Math.random() * 0.5 + 0.25; 
+    const speed = 6 + Math.random() * 3;
+    let opacity = 1;
 
-  function move() {
-    const x = parseFloat(meteor.style.left);
-    const y = parseFloat(meteor.style.top);
+    function move() {
+      const x = parseFloat(meteor.style.left);
+      const y = parseFloat(meteor.style.top);
 
-    meteor.style.left = x + speed * Math.cos(angle) + 'px';
-    meteor.style.top = y + speed * Math.sin(angle) + 'px';
-    opacity -= 0.012;
-    meteor.style.opacity = opacity;
+      meteor.style.left = x + speed * Math.cos(angle) + 'px';
+      meteor.style.top = y + speed * Math.sin(angle) + 'px';
+      opacity -= 0.012;
+      meteor.style.opacity = opacity;
 
-    if (opacity > 0 && x < window.innerWidth && y < window.innerHeight) {
-      requestAnimationFrame(move);
-    } else {
-      meteorContainer.removeChild(meteor);
+      if (opacity > 0 && x < window.innerWidth && y < window.innerHeight) {
+        requestAnimationFrame(move);
+      } else {
+        meteorContainer.removeChild(meteor);
+      }
     }
+
+    move();
   }
 
-  move();
+  setInterval(spawnMeteor, 30000);
 }
-
-setInterval(spawnMeteor, 30000);
 </script>
 
 </body>
