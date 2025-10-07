@@ -164,8 +164,17 @@ for (let i = 0; i < totalSymbols; i++) {
     el.innerText = hebrewWords[Math.floor(Math.random() * hebrewWords.length)];
   }
 
-  const fontSize = Math.max(10, (window.innerWidth / 32) * 0.7);
-  el.style.fontSize = fontSize + "px";
+  const fontSize = Math.max(12, (window.innerWidth / 32) * 0.7 * 1.2); // 20% larger
+el.style.fontSize = fontSize + "px";
+
+// Slight glow for all devices
+if (el.classList.contains('symbol')) {
+  // Hebrew words: subtle red glow
+  el.style.textShadow = '0 0 4px #ff9999';
+} else {
+  // English words: subtle cyan + slight white glow
+  el.style.textShadow = '0 0 4px #99ffff, 0 0 2px #ffffff';
+}
 
   let x, y, attempts = 0;
   do {
