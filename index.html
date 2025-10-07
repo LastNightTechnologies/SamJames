@@ -13,6 +13,7 @@
     color: #fff;
     overflow-x: hidden;
   }
+
   header {
     position: fixed;
     top: 0;
@@ -22,11 +23,13 @@
     background: rgba(0,0,0,0.6);
     z-index: 10000;
   }
+
   header h1 {
     font-size: 2.5rem;
     margin: 0;
     text-shadow: 0 0 15px #0ff, 0 0 30px #f00, 0 0 50px #fff;
   }
+
   section {
     height: 100vh;
     display: flex;
@@ -37,12 +40,14 @@
     position: relative;
     overflow: hidden;
   }
+
   h2, p { z-index: 5; }
+
   .dark { background: radial-gradient(circle at center, #000 0%, #111 100%); }
   .cosmos { background: radial-gradient(circle at center, #001 0%, #002244 100%); }
   .light { background: radial-gradient(circle at center, #fff 0%, #ccc 100%); color: #000; }
 
-  #symbols {
+  #symbols, #particles {
     position: fixed;
     top: 0;
     left: 0;
@@ -52,26 +57,47 @@
     z-index: 9999;
     overflow: hidden;
   }
-  .symbol {
+
+  .symbol, .word {
     position: absolute;
-    font-size: 2.5rem;
     font-weight: bold;
-    color: red;
     text-shadow: 0 0 20px #fff, 0 0 40px #fff;
   }
-  .word {
+
+  .symbol { color: red; }
+  .word { color: white; text-shadow: 0 0 20px #fff, 0 0 40px #0ff; }
+
+  .trail {
     position: absolute;
-    font-size: 2rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 0 20px #fff, 0 0 40px #0ff;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    filter: blur(6px);
+    opacity: 0.5;
   }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #0ff;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
   audio {
     position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10000;
+  }
+
+  @media (max-width: 600px) {
+    audio { bottom: 60px; }
   }
 </style>
 </head>
@@ -108,9 +134,12 @@
 </audio>
 
 <div id="symbols"></div>
+<div id="particles"></div>
 
 <script>
 const container = document.getElementById('symbols');
+const particleContainer = document.getElementById('particles');
+
 const hebrewWords = ["יהוה","אלוהים","אדוני","ישוע","משיח","חיים","אור","שלום"];
 const englishWords = [
   "Jesus Is My God",
@@ -119,9 +148,11 @@ const englishWords = [
   "Messiah Lives",
   "God Is My Shield"
 ];
-const totalSymbols = 40;
 
-// Place Hebrew + English words
+const totalSymbols = 30; // fewer symbols to space them out
+const symbols = [];
+
+// Create symbols with smaller font and spaced out
 for (let i = 0; i < totalSymbols; i++) {
   const el = document.createElement('div');
   if (Math.random() < 0.6) {
@@ -131,14 +162,27 @@ for (let i = 0; i < totalSymbols; i++) {
     el.classList.add('word');
     el.innerText = englishWords[Math.floor(Math.random() * englishWords.length)];
   }
-  el.style.left = Math.random() * (window.innerWidth - 100) + "px";
+
+  // Smaller font for readability
+  const fontSize = Math.max(14, window.innerWidth / 30);
+  el.style.fontSize = fontSize + "px";
+
+  // Random spacing over screen
+  el.style.left = Math.random() * (window.innerWidth - 150) + "px";
   el.style.top = Math.random() * (window.innerHeight - 50) + "px";
+
+  const trail = document.createElement('div');
+  trail.classList.add('trail');
+  trail.innerText = el.innerText;
+  el.appendChild(trail);
+
   container.appendChild(el);
+  symbols.push(el);
 }
 
 // Floating upward
 setInterval(() => {
-  document.querySelectorAll('.symbol,.word').forEach(el => {
+  symbols.forEach(el => {
     let currentTop = parseFloat(el.style.top);
     let newTop = currentTop - 1.5;
     if (newTop < -50) newTop = window.innerHeight;
@@ -146,13 +190,26 @@ setInterval(() => {
   });
 }, 30);
 
+// Particle sparks
+const particles = [];
+function spawnParticle(x, y) {
+  const p = document.createElement('div');
+  p.classList.add('particle');
+  p.style.left = x + 'px';
+  p.style.top = y + 'px';
+  const angle = Math.random() * 2 * Math.PI;
+  const speed = 1 + Math.random() * 2;
+  particles.push({el: p, angle, speed});
+  particleContainer.appendChild(p);
+}
+
 // Music beat reaction
 const audio = document.getElementById('player');
 let audioCtx, analyser, source, dataArray;
 
 audio.onplay = () => {
   if (!audioCtx) {
-    audioCtx = new AudioContext();
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     source = audioCtx.createMediaElementSource(audio);
     analyser = audioCtx.createAnalyser();
     source.connect(analyser);
@@ -168,11 +225,35 @@ function animate() {
   analyser.getByteFrequencyData(dataArray);
   let volume = dataArray.reduce((a,b)=>a+b) / dataArray.length;
 
-  document.querySelectorAll('.symbol,.word').forEach(el => {
+  symbols.forEach(el => {
     let intensity = volume / 300;
-    let yBounce = Math.sin(Date.now() / 100) * intensity * 15; // up-down bounce
-    let scale = 1 + intensity * 0.5; // pulse size with beat
+    let yBounce = Math.sin(Date.now() / 100 + Math.random()) * intensity * 15;
+    let scale = 1 + intensity * 0.4;
+
+    el.style.textShadow = `
+      0 0 ${10 + intensity*15}px #fff,
+      0 0 ${20 + intensity*30}px #0ff,
+      0 0 ${30 + intensity*45}px #f0f
+    `;
+
     el.style.transform = `translateY(${yBounce}px) scale(${scale})`;
+
+    // Spawn particle occasionally
+    if (Math.random() < intensity/3) {
+      const rect = el.getBoundingClientRect();
+      spawnParticle(rect.left + rect.width/2, rect.top + rect.height/2);
+    }
+  });
+
+  // Animate particles
+  particles.forEach((p, index) => {
+    p.el.style.left = parseFloat(p.el.style.left) + Math.cos(p.angle) * p.speed + 'px';
+    p.el.style.top = parseFloat(p.el.style.top) + Math.sin(p.angle) * p.speed + 'px';
+    p.el.style.opacity = (parseFloat(p.el.style.opacity) || 0.8) - 0.02;
+    if (parseFloat(p.el.style.opacity) <= 0) {
+      particleContainer.removeChild(p.el);
+      particles.splice(index, 1);
+    }
   });
 
   requestAnimationFrame(animate);
